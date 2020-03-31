@@ -1,19 +1,21 @@
-﻿using SongLyrics.Models;
+﻿using SongLyrics.Application.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace SongLyrics
+namespace SongLyrics.Application
 {
     public static class SongNormalizer
     {
-        public static Song Normalize(Song song)
+        public static BaseSong Normalize(BaseSong song)
         {
-            song.Name = Normalize(SpotifyNormalize(song.Name));
-            song.ArtistName = Normalize(song.ArtistName);
+            var baseSong = new BaseSong();
 
-            return song;
+            baseSong.Name = Normalize(SpotifyNormalize(song.Name));
+            baseSong.ArtistName = Normalize(song.ArtistName);
+
+            return baseSong;
         }
 
         public static string Normalize(string word)

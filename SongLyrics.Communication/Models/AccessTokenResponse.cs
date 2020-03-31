@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace SongLyrics.Communication.Models
 {
-    class AccessTokenResponse
+    public class AccessTokenResponse
     {
         [JsonPropertyName("access_token")]
         public string Token { get; set; }

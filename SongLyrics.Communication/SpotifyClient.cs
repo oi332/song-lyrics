@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using SongLyrics.Common;
 using SongLyrics.Communication.Models;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,10 @@ namespace SongLyrics.Communication
 {
     public class SpotifyClient : ISpotifyClient
     {
-        private readonly IConfiguration _config;
+        private readonly SpotifySettings _config;
         private readonly HttpClient _client;
 
-        public SpotifyClient(IConfiguration config, HttpClient client)
+        public SpotifyClient(SpotifySettings config, HttpClient client)
         {
             _config = config;
             _client = client;
@@ -24,31 +25,31 @@ namespace SongLyrics.Communication
         {
             var req = new HttpRequestMessage(HttpMethod.Get, "https://api.spotify.com/v1/me/player/currently-playing");
 
-            var accessToken = await GetAccessTokenAsync();
+            req.Headers.Add("Authorization", $"Bearer {_config.AccessToken}");
 
-            req.Headers.Add("Authorization", $"Bearer {accessToken.Token}");
+            var res = await _client.SendAsync(req);
 
-            SongResponse song;
-
-            try
+            if (res.StatusCode == System.Net.HttpStatusCode.NoContent)
             {
-                song = await MakeRequestAsync<SongResponse>(req);
+                throw new SpotifyNoSongPlayingException("No song is currently playing.");
             }
-            catch
-            {
-                throw new HttpRequestException("Failed to retrieve current playing song.");
-            }
-            
 
-            return song;
+            if (!res.IsSuccessStatusCode)
+            {
+                throw new SpotifyAccessTokenExpiredException("Access token expired.");
+            }
+                
+            var content = await res.Content.ReadAsStreamAsync();
+
+            return await JsonSerializer.DeserializeAsync<SongResponse>(content); ;
         }
 
-        private async Task<AccessTokenResponse> GetAccessTokenAsync()
+        public async Task<AccessTokenResponse> GetAccessTokenAsync()
         {
             var body = new Dictionary<string, string>();
 
             body.Add("grant_type", "refresh_token");
-            body.Add("refresh_token", _config.GetSection("SpotifySettings").GetSection("RefreshToken").Value);
+            body.Add("refresh_token", _config.RefreshToken);
 
             var req = new HttpRequestMessage(HttpMethod.Post, "https://accounts.spotify.com/api/token")
             {
@@ -58,39 +59,20 @@ namespace SongLyrics.Communication
             req.Content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
             req.Headers.Add("Authorization", $"Basic {GenerateBasicToken()}");
 
-            AccessTokenResponse accessTokenResponse;
-
-            try
-            {
-                accessTokenResponse = await MakeRequestAsync<AccessTokenResponse>(req);
-            }
-            catch
-            {
-                throw new HttpRequestException("Failed to retrieve access token for Spotify.");
-            }
-            
-            return accessTokenResponse;
-        }
-
-        private async Task<T> MakeRequestAsync<T>(HttpRequestMessage req)
-        {
             var res = await _client.SendAsync(req);
 
             if (!res.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException();
-            }
+                throw new SpotifyAccessTokenAcquireException("Failed to retrieve access token.");
 
             var content = await res.Content.ReadAsStreamAsync();
-            var result = await JsonSerializer.DeserializeAsync<T>(content);
 
-            return result;
+            return await JsonSerializer.DeserializeAsync<AccessTokenResponse>(content);
         }
 
         private string GenerateBasicToken()
         {
-            var clientId = _config.GetSection("SpotifySettings").GetSection("ClientId").Value;
-            var clientSecret = _config.GetSection("SpotifySettings").GetSection("ClientSecret").Value;
+            var clientId = _config.ClientId;
+            var clientSecret = _config.ClientSecret;
 
             return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"));
         }

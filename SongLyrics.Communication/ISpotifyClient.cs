@@ -9,5 +9,6 @@ namespace SongLyrics.Communication
     public interface ISpotifyClient
     {
         Task<SongResponse> GetCurrentPlayingSongAsync();
+        Task<AccessTokenResponse> GetAccessTokenAsync();
     }
 }

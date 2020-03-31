@@ -1,43 +1,59 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SongLyrics.Application;
+using SongLyrics.Application.Models;
+using SongLyrics.Common;
 using SongLyrics.Communication;
-using SongLyrics.Models;
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SongLyrics
 {
     class Program
     {
-        public static IConfiguration Configuration { get; set; }
-
         static async Task Main(string[] args)
         {
             var serviceProvider = RegisterServices();
+            var songService = serviceProvider.GetService<ISongService>();
 
-            var spotifyClient = serviceProvider.GetService<ISpotifyClient>();
-            var lyricsClient = serviceProvider.GetService<ILyricsClient>();
+            try
+            {
+                Print(await songService.GetCurrentlyPlayingSongAsync());
+                Console.Read();
+            }
+            catch (SpotifyAccessTokenExpiredException)
+            {
+                Console.WriteLine("Access token renewed. Restart the program.");
+                Console.Read();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.Read();
+            }
+        }
 
-            var s = (await spotifyClient.GetCurrentPlayingSongAsync()).ToEntity();
-
-            Console.WriteLine(s.ArtistName + " | " + s.Name);
-
-            SongNormalizer.Normalize(s);
-
-            var lyrics = await lyricsClient.GetLyricsAsync(s.ToRequest());
-
-            Console.WriteLine(lyrics.Lyrics);
+        public static void Print(Song song) 
+        {
+            Console.WriteLine($"{song.ArtistName} | {song.Name}");
+            Console.WriteLine(song.Lyrics);
         }
 
         private static ServiceProvider RegisterServices()
         {
             var configuration = SetupConfiguration();
+            var config = new SpotifySettings();
+
+            configuration.Bind("SpotifySettings", config);
+
             var serviceCollection = new ServiceCollection();
 
-            serviceCollection.AddSingleton(configuration);
+
+            serviceCollection.AddSingleton(config);
             serviceCollection.AddHttpClient<ISpotifyClient, SpotifyClient>();
             serviceCollection.AddHttpClient<ILyricsClient, LyricsClient>();
-
+            serviceCollection.AddScoped<ISongService, SongService>();
 
             return serviceCollection.BuildServiceProvider();
         }

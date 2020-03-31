@@ -1,4 +1,5 @@
-﻿using SongLyrics.Communication.Models;
+﻿using SongLyrics.Common;
+using SongLyrics.Communication.Models;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -21,9 +22,7 @@ namespace SongLyrics.Communication
             var res = await _client.SendAsync(req);
 
             if (!res.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException("Failed to find lyrics");
-            }
+                throw new LyricsNotFoundException("Lyrics not found.");
 
             var content = await res.Content.ReadAsStreamAsync();
             

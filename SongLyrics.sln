@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SongLyrics.Communication", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SongLyrics.Tests", "SongLyrics.Test\SongLyrics.Tests.csproj", "{AF463958-D4A9-4044-8A8A-DB0B2750A21D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SongLyrics.Application", "SongLyrics.Application\SongLyrics.Application.csproj", "{084A4FE4-67C5-4A2C-AB25-51F26659FD81}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongLyrics.Common", "SongLyrics.Common\SongLyrics.Common.csproj", "{F32AF8CF-08B6-47B4-9CF2-A048B057B31A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{AF463958-D4A9-4044-8A8A-DB0B2750A21D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF463958-D4A9-4044-8A8A-DB0B2750A21D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF463958-D4A9-4044-8A8A-DB0B2750A21D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{084A4FE4-67C5-4A2C-AB25-51F26659FD81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{084A4FE4-67C5-4A2C-AB25-51F26659FD81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{084A4FE4-67C5-4A2C-AB25-51F26659FD81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{084A4FE4-67C5-4A2C-AB25-51F26659FD81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F32AF8CF-08B6-47B4-9CF2-A048B057B31A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F32AF8CF-08B6-47B4-9CF2-A048B057B31A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F32AF8CF-08B6-47B4-9CF2-A048B057B31A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F32AF8CF-08B6-47B4-9CF2-A048B057B31A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

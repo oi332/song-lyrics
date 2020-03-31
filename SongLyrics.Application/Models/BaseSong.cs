@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SongLyrics.Models
+namespace SongLyrics.Application.Models
 {
-    public class Song
+    public class BaseSong
     {
         public string Name { get; set; }
         public string ArtistName { get; set; }
